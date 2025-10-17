@@ -1,36 +1,159 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AI Interviewer — README
 
-## Getting Started
+A modern mock interview web app built with Next.js (App Router), Tailwind CSS, shadcn/ui components and Framer Motion. This README covers how to install, run, build, and contribute.
 
-First, run the development server:
+## Table of Contents
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Project overview
+- Requirements
+- Quick start (PowerShell)
+- Scripts
+- Project structure
+- API routes
+- Testing & verification
+- Troubleshooting
+- Contribution guide
+- License
+
+## Project overview
+
+This project simulates an AI interviewer flow: upload resume & job description, run a short interview (mocked), and view detailed feedback with charts and audio playback. The UI uses shadcn/ui components and mock APIs under `app/api/`.
+
+## Requirements
+
+- Node.js 18 or later (recommended)
+- npm (bundled with Node) or an alternative package manager (pnpm, yarn)
+- Modern browser for testing (Chrome, Edge, Firefox)
+
+Verify versions in PowerShell:
+
+```powershell
+node -v
+npm -v
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick start (PowerShell)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. Open PowerShell and cd into the project root (where `package.json` is):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+cd "C:\Users\charr\OneDrive\Desktop\Main Projects\AI Interviewer"
+```
 
-## Learn More
+2. Install dependencies:
 
-To learn more about Next.js, take a look at the following resources:
+```powershell
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Start the development server (hot reload):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```powershell
+npm run dev
+```
 
-## Deploy on Vercel
+4. Open your browser to:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+http://localhost:3000
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+Available npm scripts (from `package.json`):
+
+- `npm run dev` — Start Next.js in development mode (uses turbopack here).
+- `npm run build` — Build production assets.
+- `npm run start` — Start the production server (after `npm run build`).
+- `npm run lint` — Run ESLint.
+
+If you want to run Next without turbopack for debugging, run:
+
+```powershell
+npx next dev
+```
+
+## Project structure (key files)
+
+Top-level:
+
+- `app/` — Next.js App Router pages and server actions
+	- `app/page.js` — Landing page
+	- `app/upload/page.js` — Upload workflow
+	- `app/interview/page.js` — Interview UI
+	- `app/feedback/page.js` — Feedback and charts
+	- `app/api/` — Mock server route handlers (upload, interview, feedback)
+- `components/` — Reusable components (FileUpload, AudioVisualizer, StepIndicator)
+- `lib/utils.js` — Utilities used across app
+- `public/` — Static assets
+- `package.json` — Scripts and dependencies
+
+## API routes (mocked)
+
+This app relies on local API routes in `app/api/` for demo data. Important endpoints:
+
+- `POST /api/upload` — Accepts form data (`resume`, `jobDescription`) and returns `sessionId` + generated question count.
+- `POST /api/interview` — Actions for `start`, `submit_answer`, `pause`, `resume`, `end`. Responds with next question or transcription.
+- `GET /api/feedback?sessionId={id}` — Returns mock feedback (scores, radar data, per-question details).
+
+These are intentionally mocked to make the app self-contained for demos.
+
+## Testing & verification
+
+- After `npm run dev` you'll see logs in the terminal; successful build messages contain the local URL.
+- Visit `http://localhost:3000` to manually exercise the flow: Upload -> Interview -> Feedback.
+- Use browser DevTools to inspect API responses from `/api/*` endpoints for debugging.
+
+## Troubleshooting
+
+- "npm install" fails with native module or permission errors:
+	- Ensure Node 18+ installed.
+	- Try removing `node_modules` and lockfile and reinstalling:
+
+```powershell
+rm -r node_modules; rm package-lock.json; npm install
+```
+
+- Port 3000 already in use:
+	- Kill the process using the port or start Next on a different port: `PORT=3001 npm run dev` (on PowerShell use `$env:PORT=3001; npm run dev`).
+
+- Turbopack issues in dev:
+	- Try running without turbopack: `npx next dev` or temporarily change `dev` script.
+
+- ESLint errors:
+	- Run `npm run lint` to view and fix issues.
+
+If you hit an error you don't understand, copy the terminal output and open an issue or paste it here and I can help debug.
+
+## Contribution guide
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Install deps and run locally
+4. Open a PR describing your changes
+
+Coding style and notes:
+
+- The project uses Tailwind and shadcn/ui components. Keep UI additions consistent with existing components in `components/ui/`.
+- Keep server route behavior in `app/api` simple and mocked unless adding real integrations.
+
+## Adding real integrations (notes)
+
+If you plan to connect to real AI or speech services, consider:
+
+- Storing API keys in environment variables (`.env.local`) and reading them server-side only.
+- Using a robust file parsing service for DOCX/PDF parsing before sending text to any LLM.
+- Adding rate-limits and authentication before enabling production AI calls.
+
+## License
+
+This repository contains demo code produced for the MLH hackfest. See `LICENSE` for details.
+
+---
+
+If you'd like, I can also:
+- Run `npm install` and `npm run dev` in the workspace terminal and report the output.
+- Add a short `GETTING_STARTED.md` with step-by-step PowerShell screenshots or commands.
+
+Tell me which of the above you'd like me to do next.
+

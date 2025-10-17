@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Line Chart Example - Open DataViz</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .chart-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .controls {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      background: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #357ABD;
+    }
+  </style>
+</head>
+<body>
+  <h1>Interactive Line Chart Example</h1>
+  
+  <div class="controls">
+    <h3>Features:</h3>
+    <button onclick="addFilter()">Add Filter (y > 50)</button>
+    <button onclick="clearFilters()">Clear Filters</button>
+    <button onclick="toggleTheme()">Toggle Dark Theme</button>
+    <button onclick="updateData()">Update Data</button>
+    <p><small>Try zooming with mouse wheel and panning by dragging!</small></p>
+  </div>
+  
+  <div class="chart-container">
+    <div id="chart"></div>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script type="module">
+    import { LineChart, darkTheme } from '../dist/index.esm.js';
+
+    // Generate sample data
+    function generateData(points = 50) {
+      return Array.from({ length: points }, (_, i) => ({
+        x: i,
+        y: Math.random() * 100
+      }));
+    }
+
+    // Create chart
+    const chart = new LineChart('#chart', {
+      width: 1000,
+      height: 400,
+      margin: { top: 20, right: 20, bottom: 40, left: 50 }
+    });
+
+    // Set initial data and render
+    chart.setData(generateData()).render();
+
+    // Make functions available globally
+    let isDark = false;
+    
+    window.addFilter = () => {
+      chart.addFilter(d => d.y > 50);
+      chart.render();
+    };
+
+    window.clearFilters = () => {
+      chart.clearFilters();
+      chart.render();
+    };
+
+    window.toggleTheme = () => {
+      isDark = !isDark;
+      if (isDark) {
+        chart.setTheme(darkTheme);
+        document.body.style.backgroundColor = '#1E1E1E';
+      } else {
+        chart.setTheme({
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          colors: { primary: '#4A90E2' }
+        });
+        document.body.style.backgroundColor = '#f5f5f5';
+      }
+      chart.render();
+    };
+
+    window.updateData = () => {
+      chart.update(generateData());
+    };
+  </script>
+</body>
+</html>

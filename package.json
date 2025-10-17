@@ -1,0 +1,37 @@
+{
+  "name": "open-dataviz",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "An interactive and customizable data visualization library built with open source technologies",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "lint": "eslint src/**/*.js",
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "keywords": [
+    "data-visualization",
+    "charts",
+    "interactive",
+    "d3",
+    "dataviz",
+    "open-source"
+  ],
+  "author": "Aurélie Gallet",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "eslint": "^8.54.0",
+    "jest": "^29.7.0",
+    "jsdoc": "^4.0.2",
+    "rollup": "^4.9.0"
+  },
+  "dependencies": {
+    "d3": "^7.8.5"
+  }
+}

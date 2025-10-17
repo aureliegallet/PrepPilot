@@ -1,43 +1,39 @@
-# Kairo
-Meet 
-A modern mock interview web app built with Next.js (App Router), Tailwind CSS, shadcn/ui components and Framer Motion. This README covers how to install, run, build, and contribute.
+# PrepPilot ✈️
+Meet PrepPilot! A modern mock interview web app built with Next.js (App Router), Tailwind CSS, shadcn/ui components and Framer Motion!
 
 ## Table of Contents
-
 - Overview
 - Requirements
-- Quick start (Command Prompt)
+- Quick Start
 - Scripts
-- Project structure
-- API routes
-- Testing & verification
+- Project Structure (Key Files)
+- API Routes (Mocked)
+- Testing & Verification
 - Troubleshooting
-- Contribution guide
+- Contribution Guide
+- Adding AI Integration (Notes)
 - License
 
-## Project overview
-
-This project simulates an AI interviewer flow: upload resume & job description, run a short interview (mocked), and view detailed feedback with charts and audio playback. The UI uses shadcn/ui components and mock APIs under `app/api/`.
+## Overview
+PrepPilot is simple to use! Just upload your resume & the desired job description, run a short mock interview, and view detailed feedback with charts and audio playback. The UI uses shadcn/ui components and mock APIs under `app/api/`.
 
 ## Requirements
-
 - Node.js 18 or later (recommended)
 - npm (bundled with Node) or an alternative package manager (pnpm, yarn)
 - Modern browser for testing (Chrome, Edge, Firefox)
 
-Verify versions in PowerShell:
+Verify versions in PowerShell or Command Prompt:
 
 ```powershell
 node -v
 npm -v
 ```
 
-## Quick start (PowerShell)
-
-1. Open PowerShell and cd into the project root (where `package.json` is):
+## Quick Start
+1. Open PowerShell or Command Prompt and cd into the project root (where `package.json` is):
 
 ```powershell
-cd "C:\Users\charr\OneDrive\Desktop\Main Projects\AI Interviewer"
+cd "C:\Users\charran\Desktop\PrepPilot"
 ```
 
 2. Install dependencies:
@@ -46,7 +42,7 @@ cd "C:\Users\charr\OneDrive\Desktop\Main Projects\AI Interviewer"
 npm install
 ```
 
-3. Start the development server (hot reload):
+3. Start the development server:
 
 ```powershell
 npm run dev
@@ -59,7 +55,6 @@ http://localhost:3000
 ```
 
 ## Scripts
-
 Available npm scripts (from `package.json`):
 
 - `npm run dev` — Start Next.js in development mode (uses turbopack here).
@@ -73,8 +68,7 @@ If you want to run Next without turbopack for debugging, run:
 npx next dev
 ```
 
-## Project structure (key files)
-
+## Project Structure (Key Files)
 Top-level:
 
 - `app/` — Next.js App Router pages and server actions
@@ -88,8 +82,7 @@ Top-level:
 - `public/` — Static assets
 - `package.json` — Scripts and dependencies
 
-## API routes (mocked)
-
+## API Routes (Mocked)
 This app relies on local API routes in `app/api/` for demo data. Important endpoints:
 
 - `POST /api/upload` — Accepts form data (`resume`, `jobDescription`) and returns `sessionId` + generated question count.
@@ -98,14 +91,12 @@ This app relies on local API routes in `app/api/` for demo data. Important endpo
 
 These are intentionally mocked to make the app self-contained for demos.
 
-## Testing & verification
-
+## Testing & Verification
 - After `npm run dev` you'll see logs in the terminal; successful build messages contain the local URL.
 - Visit `http://localhost:3000` to manually exercise the flow: Upload -> Interview -> Feedback.
 - Use browser DevTools to inspect API responses from `/api/*` endpoints for debugging.
 
 ## Troubleshooting
-
 - "npm install" fails with native module or permission errors:
 	- Ensure Node 18+ installed.
 	- Try removing `node_modules` and lockfile and reinstalling:
@@ -123,10 +114,7 @@ rm -r node_modules; rm package-lock.json; npm install
 - ESLint errors:
 	- Run `npm run lint` to view and fix issues.
 
-If you hit an error you don't understand, copy the terminal output and open an issue or paste it here and I can help debug.
-
-## Contribution guide
-
+## Contribution Guide
 1. Fork the repo
 2. Create a branch: `git checkout -b feature/your-feature`
 3. Install deps and run locally
@@ -137,8 +125,7 @@ Coding style and notes:
 - The project uses Tailwind and shadcn/ui components. Keep UI additions consistent with existing components in `components/ui/`.
 - Keep server route behavior in `app/api` simple and mocked unless adding real integrations.
 
-## Adding real integrations (notes)
-
+## Adding AI Integration (Notes)
 If you plan to connect to real AI or speech services, consider:
 
 - Storing API keys in environment variables (`.env.local`) and reading them server-side only.

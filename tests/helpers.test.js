@@ -65,29 +65,33 @@ describe('Helper Functions', () => {
   });
 
   describe('debounce', () => {
-    jest.useFakeTimers();
-
-    test('should delay function execution', () => {
-      const func = jest.fn();
-      const debouncedFunc = debounce(func, 1000);
+    test('should delay function execution', (done) => {
+      let called = false;
+      const func = () => { called = true; };
+      const debouncedFunc = debounce(func, 50);
       
       debouncedFunc();
-      expect(func).not.toBeCalled();
+      expect(called).toBe(false);
       
-      jest.runAllTimers();
-      expect(func).toBeCalled();
+      setTimeout(() => {
+        expect(called).toBe(true);
+        done();
+      }, 100);
     });
 
-    test('should call function only once for multiple rapid calls', () => {
-      const func = jest.fn();
-      const debouncedFunc = debounce(func, 1000);
+    test('should call function only once for multiple rapid calls', (done) => {
+      let callCount = 0;
+      const func = () => { callCount++; };
+      const debouncedFunc = debounce(func, 50);
       
       debouncedFunc();
       debouncedFunc();
       debouncedFunc();
       
-      jest.runAllTimers();
-      expect(func).toBeCalledTimes(1);
+      setTimeout(() => {
+        expect(callCount).toBe(1);
+        done();
+      }, 100);
     });
   });
 });

@@ -13,16 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "AI Interviewer - Prepare Smarter with AI-Powered Mock Interviews",
+  title: "PrepPilot — Navigate Your Next Interview",
   description:
-    "Practice interviews with AI-powered mock interviews. Upload your resume and job description, get instant feedback, and improve your interview skills.",
-  keywords: [
-    "AI interview",
-    "mock interview",
-    "interview practice",
-    "job preparation",
-    "AI interviewer",
-  ],
+    "PrepPilot: Your automated interview copilot. Upload your resume and job description for tailored interview practice with instant feedback.",
+  keywords: ["PrepPilot", "interview practice", "mock interview", "job preparation", "AI interview coach"],
 };
 
 export default function RootLayout({ children }) {

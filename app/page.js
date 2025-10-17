@@ -14,7 +14,7 @@ import {
   Upload,
   MessageSquare,
   BarChart3,
-  Sparkles,
+  Plane,
   CheckCircle2,
   ArrowRight,
 } from "lucide-react";
@@ -61,8 +61,8 @@ export default function Home() {
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-2"
           >
-            <Sparkles className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">AI Interviewer</span>
+            <Plane className="h-6 w-6 text-primary" />
+            <span className="font-bold text-xl">PrepPilot</span>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -84,17 +84,16 @@ export default function Home() {
             transition={{ duration: 0.5 }}
           >
             <Badge variant="secondary" className="mb-4">
-              <Sparkles className="h-3 w-3 mr-1" />
-              Powered by Advanced AI
+              <Plane className="h-3 w-3 mr-1" />
+              Your Interview Copilot
             </Badge>
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-6">
-              AI-Powered Mock Interviews to Help You{" "}
-              <span className="text-primary">Prepare Smarter</span>
+              Navigate Your Next Interview with{" "}
+              <span className="text-primary">Confidence</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Practice interviews with confidence. Upload your resume and job
-              description, and let our AI interviewer help you ace your next
-              interview.
+              Let PrepPilot be your guide. Upload your resume and job description,
+              and we'll help you chart a course to interview success.
             </p>
           </motion.div>
 
@@ -170,7 +169,7 @@ export default function Home() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Why Choose AI Interviewer?
+              Why Choose PrepPilot?
             </h2>
             <p className="text-lg text-muted-foreground">
               Everything you need to ace your next interview
@@ -240,7 +239,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t mt-20">
         <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
-          <p>© 2025 AI Interviewer. Built with Next.js and shadcn/ui.</p>
+          <p>© 2025 PrepPilot. Built with Next.js and shadcn/ui.</p>
         </div>
       </footer>
     </div>

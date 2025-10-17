@@ -1,0 +1,19 @@
+{
+  "name": "ai-interviewer-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Interviewer - Generate interview questions and evaluations using AI",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:all": "npm run build:backend && npm run build:frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "start:backend": "npm start --prefix backend",
+    "start:frontend": "npm run preview --prefix frontend"
+  },
+  "keywords": ["ai", "interviewer", "gemini", "react", "nodejs", "typescript"],
+  "author": "Aurélie Gallet",
+  "license": "MIT"
+}

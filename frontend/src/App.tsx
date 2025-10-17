@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { JobInput } from './components/JobInput';
 import { MetricsSelector } from './components/MetricsSelector';
 import { InterviewQuestions } from './components/InterviewQuestions';

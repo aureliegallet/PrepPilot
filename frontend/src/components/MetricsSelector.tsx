@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { InterviewMetrics } from '../types/interview';
 
 interface MetricsSelectorProps {
@@ -6,7 +6,7 @@ interface MetricsSelectorProps {
   onMetricsChange: (metrics: InterviewMetrics) => void;
 }
 
-export const MetricsSelector: React.FC<MetricsSelectorProps> = ({
+export const MetricsSelector: FC<MetricsSelectorProps> = ({
   metrics,
   onMetricsChange,
 }) => {

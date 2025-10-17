@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -34,7 +34,7 @@ interface CandidateEvaluationProps {
   onDownload: () => void;
 }
 
-export const CandidateEvaluationComponent: React.FC<CandidateEvaluationProps> = ({
+export const CandidateEvaluationComponent: FC<CandidateEvaluationProps> = ({
   evaluation,
   visualData,
   onDownload,

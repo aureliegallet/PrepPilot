@@ -1,11 +1,11 @@
-import React from 'react';
+import { FC } from 'react';
 import { InterviewQuestion } from '../types/interview';
 
 interface InterviewQuestionsProps {
   questions: InterviewQuestion[];
 }
 
-export const InterviewQuestions: React.FC<InterviewQuestionsProps> = ({ questions }) => {
+export const InterviewQuestions: FC<InterviewQuestionsProps> = ({ questions }) => {
   const getDifficultyClass = (difficulty: string) => {
     switch (difficulty) {
       case 'easy':

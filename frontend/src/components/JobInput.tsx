@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 
 interface JobInputProps {
   jobDescription: string;
@@ -7,7 +7,7 @@ interface JobInputProps {
   onResumeChange: (value: string) => void;
 }
 
-export const JobInput: React.FC<JobInputProps> = ({
+export const JobInput: FC<JobInputProps> = ({
   jobDescription,
   resume,
   onJobDescriptionChange,

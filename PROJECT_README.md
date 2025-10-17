@@ -33,13 +33,30 @@ A modern, professional AI-powered mock interview platform built with Next.js 15 
 - **Notifications**: Sonner
 - **Icons**: Lucide React
 
+### 🔌 AI & Backend Integrations
+
+- **Gemini API**: AI-powered question generation and answer analysis
+  - Generates personalized interview questions from resume and job description
+  - Analyzes candidate answers in real-time
+  - Provides comprehensive feedback and scoring
+- **Snowflake** (Optional): Data warehouse for analytics
+  - Stores interview sessions and feedback
+  - Enables historical performance tracking
+  - Powers analytics dashboards
+- **Auth0** (Optional): Authentication and user management
+  - Secure user authentication
+  - Session management
+  - Protected routes and API endpoints
+
+> **Note**: All integrations gracefully fall back to mock data when API keys are not configured, allowing you to test the UI without setting up external services.
+
 ## 📁 Project Structure
 
 ```
 ├── app/
 │   ├── api/
-│   │   ├── upload/route.js          # File upload API
-│   │   ├── interview/route.js       # Interview session API
+│   │   ├── upload/route.js          # File upload API with Gemini integration
+│   │   ├── interview/route.js       # Interview session API with answer analysis
 │   │   └── feedback/route.js        # Feedback generation API
 │   ├── upload/page.js               # Document upload page
 │   ├── interview/page.js            # Interview interface
@@ -52,8 +69,13 @@ A modern, professional AI-powered mock interview platform built with Next.js 15 
 │   ├── StepIndicator.jsx            # Multi-step progress indicator
 │   ├── FileUpload.jsx               # Drag-and-drop file uploader
 │   └── AudioVisualizer.jsx          # Audio recording visualizer
-└── lib/
-    └── utils.js                     # Utility functions
+├── lib/
+│   ├── utils.js                     # Utility functions
+│   ├── gemini.js                    # Gemini API integration
+│   ├── snowflake.js                 # Snowflake data warehouse integration
+│   └── auth0.js                     # Auth0 authentication integration
+├── .env.example                     # Environment variables template
+└── FURTHER_STEPS.md                 # Detailed implementation guide
 
 ```
 
@@ -62,8 +84,11 @@ A modern, professional AI-powered mock interview platform built with Next.js 15 
 ### Prerequisites
 - Node.js 18+ installed
 - npm or yarn package manager
+- (Optional) Gemini API key for AI features
+- (Optional) Snowflake account for data persistence
+- (Optional) Auth0 account for authentication
 
-### Installation
+### Quick Start (UI Testing)
 
 1. Clone the repository:
 ```bash
@@ -82,6 +107,37 @@ npm run dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+The app will work with mock data, allowing you to test all UI flows without configuring external services.
+
+### Full Setup (with AI Integration)
+
+1. **Copy environment template:**
+```bash
+cp .env.example .env.local
+```
+
+2. **Get Gemini API Key:**
+   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Create an API key
+   - Add to `.env.local`: `GEMINI_API_KEY=your_key_here`
+
+3. **(Optional) Configure Snowflake:**
+   - Sign up at [Snowflake](https://signup.snowflake.com/)
+   - Create database and tables (see `lib/snowflake.js` for schema)
+   - Add credentials to `.env.local`
+
+4. **(Optional) Configure Auth0:**
+   - Create account at [Auth0](https://auth0.com/)
+   - Set up application
+   - Add credentials to `.env.local`
+
+5. **Run the application:**
+```bash
+npm run dev
+```
+
+For detailed setup instructions, see [FURTHER_STEPS.md](FURTHER_STEPS.md).
 
 ## 📄 Pages Overview
 
@@ -141,62 +197,147 @@ npm run dev
 ## 🔌 API Routes
 
 ### POST `/api/upload`
-Upload resume and job description files.
+Upload resume and job description files. Uses **Gemini API** to generate personalized interview questions.
+
 ```javascript
 FormData:
-- resume: File (PDF/DOCX)
+- resume: File (PDF/DOCX/TXT)
 - jobDescription: File (PDF/DOCX/TXT)
 
 Response:
+- success: boolean
 - sessionId: string
 - questionsGenerated: number
+- questions: Array<{id, question, category}>
+
+AI Features:
+- Analyzes resume content
+- Matches with job requirements
+- Generates 10 relevant questions
+- Categorizes by type (behavioral, technical, experience, situational)
 ```
 
 ### POST `/api/interview`
-Handle interview actions (start, submit_answer, pause, resume, end).
+Handle interview actions. Uses **Gemini API** to analyze answers in real-time.
+
 ```javascript
 Body:
 - sessionId: string
 - action: 'start' | 'submit_answer' | 'pause' | 'resume' | 'end'
-- audioData?: Blob
+- audioData?: Blob (future: for transcription)
+- answer?: string
 - currentQuestion?: number
 
-Response:
-- question: string (for start/submit_answer)
+Response (for submit_answer):
+- success: boolean
+- transcription: string
+- analysis: {score, quickFeedback}
+- nextQuestion: string
 - questionIndex: number
-- transcription: string (for submit_answer)
+
+AI Features:
+- Analyzes answer quality and relevance
+- Provides real-time scoring (0-100)
+- Generates constructive feedback
+- Suggests improvements
 ```
 
 ### GET `/api/interview?sessionId={id}`
 Retrieve current interview session state.
 
+```javascript
+Response:
+- success: boolean
+- sessionId: string
+- currentQuestion: number
+- totalQuestions: number
+- status: 'pending' | 'in_progress' | 'paused' | 'completed'
+```
+
 ### GET `/api/feedback?sessionId={id}`
-Get comprehensive interview feedback and analytics.
+Get comprehensive interview feedback. Uses **Gemini API** to generate detailed analysis.
+
+```javascript
+Response:
+- success: boolean
+- feedback: {
+    overallScore: number,
+    performanceLevel: string,
+    duration: string,
+    questionsAnswered: number,
+    strengths: Array<string>,
+    weaknesses: Array<string>,
+    detailedFeedback: Array<{question, answer, score, feedback, suggestions}>,
+    skillsAssessment: {communication, technical, problemSolving, etc.},
+    recommendations: Array<string>
+  }
+
+AI Features:
+- Comprehensive analysis of all answers
+- Overall performance scoring
+- Skills assessment across multiple dimensions
+- Personalized recommendations
+- Actionable improvement suggestions
+```
 
 ### POST `/api/feedback`
 Handle feedback actions (download, share, regenerate).
 
-## 🎯 Future Enhancements
+## 🎯 Implementation Status
 
-### Backend Integration
-- [ ] Implement actual file parsing (PDF/DOCX extraction)
-- [ ] Integrate Speech-to-Text API (e.g., OpenAI Whisper, Google Speech-to-Text)
-- [ ] Integrate AI for question generation (e.g., OpenAI GPT-4, Claude)
-- [ ] Implement audio recording and storage
-- [ ] Add database for session and user management
-- [ ] Implement authentication and user accounts
+### ✅ Completed Features
 
-### Features
+#### AI Integration
+- ✅ Gemini API integration for question generation
+- ✅ Gemini API integration for answer analysis
+- ✅ Comprehensive feedback generation with AI
+- ✅ Real-time scoring and suggestions
+- ✅ Graceful fallback to mock data when API not configured
+
+#### Backend Integration Structure
+- ✅ Snowflake integration module (ready to enable)
+- ✅ Auth0 authentication module (ready to enable)
+- ✅ Environment variable configuration (.env.example)
+- ✅ Session management in API routes
+- ✅ Data storage interfaces
+
+#### UI/UX
+- ✅ Complete interview flow (Upload → Interview → Feedback)
+- ✅ Responsive design
+- ✅ Smooth animations
+- ✅ Interactive charts and visualizations
+- ✅ Toast notifications
+
+### 🔨 Future Enhancements
+
+#### File Processing
+- [ ] Implement actual PDF parsing (pdf-parse)
+- [ ] Implement DOCX parsing (mammoth)
+- [ ] File storage in cloud (Digital Ocean Spaces or S3)
+
+#### Audio Features
+- [ ] Browser audio recording (MediaRecorder API)
+- [ ] Speech-to-Text API integration (OpenAI Whisper or Google Speech-to-Text)
+- [ ] Audio storage and playback
+
+#### Authentication & Data
+- [ ] Enable Auth0 (uncomment code, add credentials)
+- [ ] Enable Snowflake (uncomment code, set up database)
+- [ ] Implement user dashboards
+- [ ] Interview history tracking
+
+#### Advanced Features
 - [ ] Multi-language support
 - [ ] Different interview types (technical, behavioral, case study)
-- [ ] Interview history and progress tracking
 - [ ] Customizable interview duration and difficulty
 - [ ] Video recording option
 - [ ] Real-time interviewer avatar
 - [ ] Practice mode with hints
 - [ ] Community-shared job descriptions
+- [ ] PDF report generation
+- [ ] Share links for feedback
 
-### Analytics
+#### Analytics
 - [ ] Historical performance trends
 - [ ] Comparison with industry benchmarks
 - [ ] Detailed speech analysis (pace, filler words, confidence)
@@ -232,8 +373,22 @@ npm run lint
 
 This project is built for educational purposes during the MLH Hackfest.
 
+## 📚 Documentation
+
+- **[FURTHER_STEPS.md](FURTHER_STEPS.md)** - Comprehensive guide for implementing and deploying all integrations
+  - Detailed API setup instructions (Gemini, Snowflake, Auth0)
+  - Environment configuration
+  - Feature implementation steps
+  - Testing strategies
+  - Deployment guides
+  - Security best practices
+  - Monitoring and analytics setup
+
 ## 🙏 Acknowledgments
 
+- [Google Gemini](https://ai.google.dev/) for AI-powered interview capabilities
+- [Snowflake](https://www.snowflake.com/) for data warehousing support
+- [Auth0](https://auth0.com/) for authentication infrastructure
 - [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
 - [Next.js](https://nextjs.org/) for the React framework
 - [Framer Motion](https://www.framer.com/motion/) for animations
@@ -242,4 +397,4 @@ This project is built for educational purposes during the MLH Hackfest.
 
 ---
 
-Built with ❤️ using Next.js and shadcn/ui
+Built with ❤️ using Next.js, shadcn/ui, and Google Gemini AI

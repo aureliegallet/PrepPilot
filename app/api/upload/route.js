@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { generateInterviewQuestions } from "@/lib/gemini";
 import { storeInterviewSession } from "@/lib/snowflake";
 import { getUserSession } from "@/lib/auth0";
+import { randomBytes } from "crypto";
 
 // Import interview sessions storage
 let interviewSessions;
@@ -46,8 +47,8 @@ export async function POST(request) {
       jobDescriptionText
     );
 
-    // Create session ID
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Create session ID using cryptographically secure random bytes
+    const sessionId = `session_${Date.now()}_${randomBytes(8).toString("hex")}`;
 
     // Store in interview sessions map
     interviewSessions.set(sessionId, {

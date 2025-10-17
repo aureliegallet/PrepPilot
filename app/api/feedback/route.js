@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { generateComprehensiveFeedback } from "@/lib/gemini";
 import { storeFeedback } from "@/lib/snowflake";
 import { getUserSession } from "@/lib/auth0";
+import { randomBytes } from "crypto";
 
 // Import the interview sessions from interview route
 // In production, this should be from a database
@@ -136,8 +137,8 @@ export async function POST(request) {
         });
 
       case "share":
-        // Generate shareable link
-        const shareToken = `share_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Generate shareable link using cryptographically secure random bytes
+        const shareToken = `share_${Date.now()}_${randomBytes(8).toString("hex")}`;
 
         // TODO: Store share token in database with expiration
         // Associate with session ID

@@ -207,9 +207,10 @@
     </footer>
   </div>
 
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script type="module">
-    import { LineChart, BarChart, ScatterPlot, PieChart, darkTheme } from './dist/index.esm.js';
+  <script src="./dist/d3.min.js"></script>
+  <script src="./dist/index.umd.js"></script>
+  <script>
+    const { LineChart, BarChart, ScatterPlot, PieChart, darkTheme } = OpenDataViz;
 
     // Generate sample data
     function generateLineData(points = 50) {

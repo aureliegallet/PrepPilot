@@ -3,7 +3,9 @@ node_modules/
 package-lock.json
 
 # Build output
-dist/
+dist/*.js
+dist/*.map
+!dist/d3.min.js
 
 # Documentation output
 docs/api/

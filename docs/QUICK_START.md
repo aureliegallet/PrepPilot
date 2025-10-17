@@ -2,6 +2,41 @@
 
 Get started with Open DataViz in minutes!
 
+## Try It Locally First! 🚀
+
+The fastest way to see Open DataViz in action is using our test script:
+
+```bash
+# From the project root, run:
+python test.py
+```
+
+This single command will:
+- ✅ Check and install dependencies automatically
+- ✅ Build the library
+- ✅ Start a local web server
+- ✅ Open the interactive demo in your browser
+
+### Advanced Options
+
+```bash
+# Open specific examples
+python test.py --example line      # Line chart
+python test.py --example bar       # Bar chart
+python test.py --example scatter   # Scatter plot
+python test.py --example pie       # Pie chart
+
+# Use a different port
+python test.py --port 3000
+
+# List all available examples
+python test.py --list
+```
+
+**Requirements:** Python 3.x (Node.js will be installed automatically if needed)
+
+---
+
 ## Installation
 
 ### Option 1: Using npm (Recommended)

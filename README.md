@@ -14,6 +14,28 @@ An interactive and customizable data visualization library built with open sourc
 
 ## 🚀 Quick Start
 
+### Try It Locally (Recommended)
+
+The easiest way to test the library is using our Python test script:
+
+```bash
+# Simple - just run this command
+python test.py
+
+# Or specify options
+python test.py --port 3000              # Use a different port
+python test.py --example line           # Open specific example
+python test.py --list                   # List all examples
+```
+
+This will:
+1. Automatically install dependencies (if needed)
+2. Build the library
+3. Start a local server
+4. Open the demo in your browser
+
+**Requirements:** Python 3.x (Node.js and npm will be installed if needed)
+
 ### Installation
 
 ```bash
@@ -95,6 +117,26 @@ const chart = new LineChart('#container', {
 For complete documentation, see [docs/README.md](docs/README.md)
 
 ## 🎯 Examples
+
+### Quick Testing with test.py
+
+The fastest way to see the library in action:
+
+```bash
+# Start the demo server (auto-builds if needed)
+python test.py
+
+# Or try specific examples
+python test.py --example line      # Line chart
+python test.py --example bar       # Bar chart  
+python test.py --example scatter   # Scatter plot
+python test.py --example pie       # Pie chart
+
+# List all available examples
+python test.py --list
+```
+
+### Manual Setup
 
 Check out the `examples/` directory for working examples:
 

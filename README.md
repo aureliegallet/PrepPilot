@@ -1,12 +1,12 @@
-# AI Interviewer — README
-
+# Kairo
+Meet 
 A modern mock interview web app built with Next.js (App Router), Tailwind CSS, shadcn/ui components and Framer Motion. This README covers how to install, run, build, and contribute.
 
 ## Table of Contents
 
-- Project overview
+- Overview
 - Requirements
-- Quick start (PowerShell)
+- Quick start (Command Prompt)
 - Scripts
 - Project structure
 - API routes
@@ -144,16 +144,3 @@ If you plan to connect to real AI or speech services, consider:
 - Storing API keys in environment variables (`.env.local`) and reading them server-side only.
 - Using a robust file parsing service for DOCX/PDF parsing before sending text to any LLM.
 - Adding rate-limits and authentication before enabling production AI calls.
-
-## License
-
-This repository contains demo code produced for the MLH hackfest. See `LICENSE` for details.
-
----
-
-If you'd like, I can also:
-- Run `npm install` and `npm run dev` in the workspace terminal and report the output.
-- Add a short `GETTING_STARTED.md` with step-by-step PowerShell screenshots or commands.
-
-Tell me which of the above you'd like me to do next.
-

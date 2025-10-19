@@ -54,7 +54,8 @@ export async function POST(request) {
 
     // Generate interview questions using Gemini AI
     let questions = [];
-    let sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Use crypto.randomUUID() for secure random session ID generation
+    let sessionId = `session_${Date.now()}_${crypto.randomUUID()}`;
 
     if (genAI) {
       try {
@@ -124,9 +125,9 @@ Return ONLY the JSON array, no additional text.`;
     };
 
     // In production, store this in a database
-    // For demo purposes, we'll return it to the client
+    // For demo purposes, we'll use in-memory storage with Object.create(null) to prevent prototype pollution
     if (typeof global.sessions === "undefined") {
-      global.sessions = {};
+      global.sessions = Object.create(null);
     }
     global.sessions[sessionId] = sessionData;
 

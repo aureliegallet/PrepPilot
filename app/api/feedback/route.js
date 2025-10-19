@@ -18,14 +18,23 @@ export async function GET(request) {
       );
     }
 
-    // Get session data
-    const session = global.sessions?.[sessionId];
-    if (!session) {
+    // Validate sessionId to prevent prototype pollution
+    if (typeof sessionId !== 'string' || sessionId.includes('__proto__') || sessionId.includes('prototype') || sessionId.includes('constructor')) {
+      return NextResponse.json(
+        { error: "Invalid session ID" },
+        { status: 400 }
+      );
+    }
+
+    // Get session data safely
+    const sessions = global.sessions || {};
+    if (!Object.prototype.hasOwnProperty.call(sessions, sessionId)) {
       return NextResponse.json(
         { error: "Session not found" },
         { status: 404 }
       );
     }
+    const session = sessions[sessionId];
 
     // Generate feedback using Gemini AI or use mock data
     let feedback;

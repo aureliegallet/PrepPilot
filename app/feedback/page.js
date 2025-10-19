@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,8 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { StepIndicator } from "@/components/StepIndicator";
+import { toast } from "sonner";
+import jsPDF from "jspdf";
 import {
   BarChart,
   Bar,
@@ -40,6 +42,32 @@ import Link from "next/link";
 export default function FeedbackPage() {
   const [audioPlaying, setAudioPlaying] = useState({});
   const [audioProgress, setAudioProgress] = useState({});
+  const [audioRecordings, setAudioRecordings] = useState({});
+  const [audioElements, setAudioElements] = useState({});
+
+  useEffect(() => {
+    // Load audio recordings from sessionStorage
+    if (typeof window !== "undefined") {
+      const recordings = JSON.parse(sessionStorage.getItem("audioRecordings") || "{}");
+      setAudioRecordings(recordings);
+      
+      // Create audio elements for each recording
+      const elements = {};
+      Object.keys(recordings).forEach((questionId) => {
+        const audio = new Audio(recordings[questionId]);
+        audio.addEventListener('timeupdate', () => {
+          const progress = (audio.currentTime / audio.duration) * 100;
+          setAudioProgress(prev => ({ ...prev, [questionId]: progress }));
+        });
+        audio.addEventListener('ended', () => {
+          setAudioPlaying(prev => ({ ...prev, [questionId]: false }));
+          setAudioProgress(prev => ({ ...prev, [questionId]: 0 }));
+        });
+        elements[questionId] = audio;
+      });
+      setAudioElements(elements);
+    }
+  }, []);
 
   // Mock data
   const overallScore = 78;
@@ -134,30 +162,160 @@ export default function FeedbackPage() {
   ];
 
   const toggleAudioPlayback = (questionId) => {
-    setAudioPlaying(prev => ({
-      ...prev,
-      [questionId]: !prev[questionId]
-    }));
+    const audio = audioElements[questionId];
+    if (!audio) {
+      toast.error("No audio recording available for this question");
+      return;
+    }
 
-    // Simulate audio progress
-    if (!audioPlaying[questionId]) {
-      const interval = setInterval(() => {
-        setAudioProgress(prev => {
-          const current = prev[questionId] || 0;
-          if (current >= 100) {
-            clearInterval(interval);
-            setAudioPlaying(p => ({ ...p, [questionId]: false }));
-            return { ...prev, [questionId]: 0 };
-          }
-          return { ...prev, [questionId]: current + 5 };
-        });
-      }, 200);
+    if (audioPlaying[questionId]) {
+      audio.pause();
+      setAudioPlaying(prev => ({ ...prev, [questionId]: false }));
+    } else {
+      // Pause all other audio
+      Object.keys(audioElements).forEach(id => {
+        if (id !== questionId.toString()) {
+          audioElements[id].pause();
+          setAudioPlaying(prev => ({ ...prev, [id]: false }));
+        }
+      });
+      
+      audio.play();
+      setAudioPlaying(prev => ({ ...prev, [questionId]: true }));
     }
   };
 
   const downloadReport = () => {
-    // Simulate download
-    alert("Report download would start here. This would generate a PDF with your complete feedback.");
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let yPos = 20;
+
+      // Title
+      doc.setFontSize(24);
+      doc.setFont(undefined, 'bold');
+      doc.text("PrepPilot Interview Feedback Report", pageWidth / 2, yPos, { align: 'center' });
+      yPos += 15;
+
+      // Overall Score
+      doc.setFontSize(16);
+      doc.text(`Overall Score: ${overallScore}/100`, 20, yPos);
+      yPos += 10;
+      
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Duration: ${duration}`, 20, yPos);
+      yPos += 7;
+      doc.text(`Questions Answered: ${questionsAnswered}/${totalQuestions}`, 20, yPos);
+      yPos += 7;
+      doc.text(`Performance: ${performanceBadge}`, 20, yPos);
+      yPos += 15;
+
+      // Strengths
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text("Strengths:", 20, yPos);
+      yPos += 8;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      strengths.forEach((strength, idx) => {
+        const lines = doc.splitTextToSize(`${idx + 1}. ${strength}`, pageWidth - 40);
+        lines.forEach(line => {
+          if (yPos > pageHeight - 20) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(line, 25, yPos);
+          yPos += 6;
+        });
+      });
+      yPos += 10;
+
+      // Weaknesses
+      if (yPos > pageHeight - 40) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text("Areas for Improvement:", 20, yPos);
+      yPos += 8;
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      weaknesses.forEach((weakness, idx) => {
+        const lines = doc.splitTextToSize(`${idx + 1}. ${weakness}`, pageWidth - 40);
+        lines.forEach(line => {
+          if (yPos > pageHeight - 20) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(line, 25, yPos);
+          yPos += 6;
+        });
+      });
+      yPos += 10;
+
+      // Detailed Feedback
+      detailedFeedback.forEach((item, idx) => {
+        if (yPos > pageHeight - 60) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Question ${idx + 1} (Score: ${item.score}/100)`, 20, yPos);
+        yPos += 7;
+
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'normal');
+        const questionLines = doc.splitTextToSize(item.question, pageWidth - 40);
+        questionLines.forEach(line => {
+          if (yPos > pageHeight - 20) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(line, 20, yPos);
+          yPos += 6;
+        });
+        yPos += 3;
+
+        const feedbackLines = doc.splitTextToSize(`Feedback: ${item.feedback}`, pageWidth - 40);
+        feedbackLines.forEach(line => {
+          if (yPos > pageHeight - 20) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(line, 20, yPos);
+          yPos += 6;
+        });
+        yPos += 8;
+      });
+
+      // Footer
+      const totalPages = doc.internal.pages.length - 1;
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.text(
+          `PrepPilot Interview Report - Page ${i} of ${totalPages}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: 'center' }
+        );
+      }
+
+      doc.save(`PrepPilot-Feedback-${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success("Report downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate report. Please try again.");
+    }
   };
 
   const shareResults = () => {

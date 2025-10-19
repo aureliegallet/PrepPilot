@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
 import { AudioVisualizer } from "@/components/AudioVisualizer";
 import { StepIndicator } from "@/components/StepIndicator";
 import {
@@ -34,9 +35,13 @@ export default function InterviewPage() {
   const [questions, setQuestions] = useState([]);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [interviewStarted, setInterviewStarted] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [timeLimit, setTimeLimit] = useState(120); // 2 minutes in seconds
+  const [audioRecordings, setAudioRecordings] = useState({});
   const scrollRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
 
   useEffect(() => {
     // Get session ID from sessionStorage
@@ -132,6 +137,27 @@ export default function InterviewPage() {
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        
+        // Store the audio recording
+        const questionId = currentQuestionIndex + 1;
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioRecordings(prev => ({
+          ...prev,
+          [questionId]: { blob: audioBlob, url: audioUrl }
+        }));
+        
+        // Store in sessionStorage for feedback page
+        if (typeof window !== "undefined") {
+          const recordings = JSON.parse(sessionStorage.getItem("audioRecordings") || "{}");
+          // Convert blob to base64 for storage
+          const reader = new FileReader();
+          reader.readAsDataURL(audioBlob);
+          reader.onloadend = () => {
+            recordings[questionId] = reader.result;
+            sessionStorage.setItem("audioRecordings", JSON.stringify(recordings));
+          };
+        }
+        
         await processAnswer(audioBlob);
         
         // Stop all tracks
@@ -141,6 +167,23 @@ export default function InterviewPage() {
       mediaRecorder.start();
       setIsRecording(true);
       setIsPaused(false);
+      setRecordingTime(0);
+      
+      // Start recording timer
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime(prev => {
+          const newTime = prev + 1;
+          if (newTime >= timeLimit) {
+            // Auto-stop when time limit reached
+            stopRecording();
+            toast.warning(`Time limit of ${timeLimit / 60} minutes reached. Recording stopped.`);
+            clearInterval(recordingTimerRef.current);
+            return timeLimit;
+          }
+          return newTime;
+        });
+      }, 1000);
+      
       toast.success("Recording started");
     } catch (error) {
       console.error("Error starting recording:", error);
@@ -152,6 +195,9 @@ export default function InterviewPage() {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.pause();
       setIsPaused(true);
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
       toast.info("Recording paused");
     }
   };
@@ -160,6 +206,21 @@ export default function InterviewPage() {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "paused") {
       mediaRecorderRef.current.resume();
       setIsPaused(false);
+      
+      // Resume timer
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime(prev => {
+          const newTime = prev + 1;
+          if (newTime >= timeLimit) {
+            stopRecording();
+            toast.warning(`Time limit of ${timeLimit / 60} minutes reached. Recording stopped.`);
+            clearInterval(recordingTimerRef.current);
+            return timeLimit;
+          }
+          return newTime;
+        });
+      }, 1000);
+      
       toast.success("Recording resumed");
     }
   };
@@ -169,6 +230,9 @@ export default function InterviewPage() {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsPaused(false);
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
     }
   };
 
@@ -239,6 +303,12 @@ export default function InterviewPage() {
     });
   };
 
+  const formatRecordingTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-muted/20 to-background">
       {/* Navigation */}
@@ -281,16 +351,56 @@ export default function InterviewPage() {
                   <AudioVisualizer isRecording={isRecording && !isPaused} />
 
                   {!interviewStarted ? (
-                    <Button
-                      onClick={startInterview}
-                      size="lg"
-                      className="w-full text-lg py-6"
-                    >
-                      <Play className="mr-2 h-5 w-5" />
-                      Start Interview
-                    </Button>
+                    <>
+                      <div className="w-full space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Answer Time Limit (minutes)</label>
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 5].map((mins) => (
+                              <Button
+                                key={mins}
+                                variant={timeLimit === mins * 60 ? "default" : "outline"}
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => setTimeLimit(mins * 60)}
+                              >
+                                {mins}m
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={startInterview}
+                        size="lg"
+                        className="w-full text-lg py-6"
+                      >
+                        <Play className="mr-2 h-5 w-5" />
+                        Start Interview
+                      </Button>
+                    </>
                   ) : (
                     <div className="w-full space-y-4">
+                      {/* Recording Timer */}
+                      {isRecording && (
+                        <Card className="bg-muted/50">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">Recording Time</span>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={recordingTime >= timeLimit * 0.9 ? "destructive" : "default"}>
+                                  {formatRecordingTime(recordingTime)} / {formatRecordingTime(timeLimit)}
+                                </Badge>
+                              </div>
+                            </div>
+                            <Progress 
+                              value={(recordingTime / timeLimit) * 100} 
+                              className="mt-2 h-2"
+                            />
+                          </CardContent>
+                        </Card>
+                      )}
+                      
                       {!isRecording ? (
                         <Button
                           onClick={startRecording}

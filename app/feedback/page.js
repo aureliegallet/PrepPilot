@@ -261,17 +261,23 @@ export default function FeedbackPage() {
 
       // Detailed Feedback
       detailedFeedback.forEach((item, idx) => {
-        if (yPos > pageHeight - 60) {
+        if (yPos > pageHeight - 80) {
           doc.addPage();
           yPos = 20;
         }
 
+        // Question header with score
         doc.setFontSize(13);
         doc.setFont(undefined, 'bold');
         doc.text(`Question ${idx + 1} (Score: ${item.score}/100)`, 20, yPos);
-        yPos += 7;
+        yPos += 8;
 
+        // Question text
         doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text("Question:", 20, yPos);
+        yPos += 6;
+        
         doc.setFont(undefined, 'normal');
         const questionLines = doc.splitTextToSize(item.question, pageWidth - 40);
         questionLines.forEach(line => {
@@ -282,9 +288,32 @@ export default function FeedbackPage() {
           doc.text(line, 20, yPos);
           yPos += 6;
         });
-        yPos += 3;
+        yPos += 4;
 
-        const feedbackLines = doc.splitTextToSize(`Feedback: ${item.feedback}`, pageWidth - 40);
+        // Transcription section
+        doc.setFont(undefined, 'bold');
+        doc.text("Transcription:", 20, yPos);
+        yPos += 6;
+        
+        doc.setFont(undefined, 'normal');
+        const transcriptionLines = doc.splitTextToSize(item.answer, pageWidth - 40);
+        transcriptionLines.forEach(line => {
+          if (yPos > pageHeight - 20) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(line, 20, yPos);
+          yPos += 6;
+        });
+        yPos += 4;
+
+        // Feedback section
+        doc.setFont(undefined, 'bold');
+        doc.text("Feedback:", 20, yPos);
+        yPos += 6;
+        
+        doc.setFont(undefined, 'normal');
+        const feedbackLines = doc.splitTextToSize(item.feedback, pageWidth - 40);
         feedbackLines.forEach(line => {
           if (yPos > pageHeight - 20) {
             doc.addPage();
@@ -293,7 +322,7 @@ export default function FeedbackPage() {
           doc.text(line, 20, yPos);
           yPos += 6;
         });
-        yPos += 8;
+        yPos += 10;
       });
 
       // Footer

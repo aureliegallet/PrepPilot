@@ -1,20 +1,52 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Initialize Gemini AI
-const genAI = process.env.GEMINI_API_KEY 
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-  : null;
+import { PDFParse } from "pdf-parse";
+import mammoth from "mammoth";
 
 // Helper function to extract text from file buffer
 async function extractTextFromFile(file) {
   const buffer = await file.arrayBuffer();
-  const text = Buffer.from(buffer).toString("utf-8");
-  
-  // For PDF and DOCX, we'd normally use a proper parser
-  // For this demo, we'll treat all as text files
-  // In production, use libraries like pdf-parse or mammoth for proper extraction
-  return text;
+  const nodeBuffer = Buffer.from(buffer);
+  const fileType = file.type;
+  const fileName = file.name.toLowerCase();
+
+  try {
+    // Handle PDF files
+    if (fileType === "application/pdf" || fileName.endsWith(".pdf")) {
+      const pdfParse = new PDFParse();
+      const data = await pdfParse.parse(nodeBuffer);
+      return data.text;
+    }
+    
+    // Handle DOCX files
+    if (
+      fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      fileName.endsWith(".docx")
+    ) {
+      const result = await mammoth.extractRawText({ buffer: nodeBuffer });
+      return result.value;
+    }
+    
+    // Handle DOC files (limited support, try as text)
+    if (fileType === "application/msword" || fileName.endsWith(".doc")) {
+      // DOC files are binary format, mammoth doesn't support them well
+      // Fall back to text extraction
+      const text = nodeBuffer.toString("utf-8");
+      // Clean up binary characters
+      return text.replace(/[\x00-\x1F\x7F-\x9F]/g, " ").trim();
+    }
+    
+    // Handle plain text files
+    if (fileType === "text/plain" || fileName.endsWith(".txt")) {
+      return nodeBuffer.toString("utf-8");
+    }
+    
+    // Default: try to extract as text
+    return nodeBuffer.toString("utf-8");
+  } catch (error) {
+    console.error("Error in extractTextFromFile:", error);
+    // Fall back to plain text extraction
+    return nodeBuffer.toString("utf-8");
+  }
 }
 
 export async function POST(request) {
@@ -52,67 +84,8 @@ export async function POST(request) {
       );
     }
 
-    // Generate interview questions using Gemini AI
-    let questions = [];
     // Use crypto.randomUUID() for secure random session ID generation
     let sessionId = `session_${Date.now()}_${crypto.randomUUID()}`;
-
-    if (genAI) {
-      try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        
-        const prompt = `Based on the following resume and job description, generate 7-10 relevant interview questions.
-        
-Resume:
-${resumeText.substring(0, 3000)}
-
-Job Description:
-${jobDescriptionText.substring(0, 2000)}
-
-Please generate questions that:
-1. Test technical skills mentioned in the job description
-2. Assess experience related to the resume
-3. Evaluate problem-solving abilities
-4. Check cultural fit
-5. Are open-ended and require detailed answers
-
-Format the output as a JSON array of objects with the following structure:
-[
-  {
-    "id": 1,
-    "question": "question text here",
-    "category": "technical|behavioral|experience|problem-solving"
-  }
-]
-
-Return ONLY the JSON array, no additional text.`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        
-        // Try to parse the JSON response
-        try {
-          // Extract JSON from the response (handle markdown code blocks)
-          const jsonMatch = text.match(/\[[\s\S]*\]/);
-          if (jsonMatch) {
-            questions = JSON.parse(jsonMatch[0]);
-          }
-        } catch (parseError) {
-          console.error("Error parsing Gemini response:", parseError);
-          // Fall back to default questions
-          questions = generateDefaultQuestions();
-        }
-      } catch (error) {
-        console.error("Gemini API error:", error);
-        // Fall back to default questions
-        questions = generateDefaultQuestions();
-      }
-    } else {
-      // No API key, use default questions
-      console.log("No Gemini API key found, using default questions");
-      questions = generateDefaultQuestions();
-    }
 
     // Store session data (in production, use a database)
     // For now, we'll use in-memory storage or rely on client-side sessionStorage
@@ -120,7 +93,6 @@ Return ONLY the JSON array, no additional text.`;
       sessionId,
       resumeText: resumeText.substring(0, 5000),
       jobDescriptionText: jobDescriptionText.substring(0, 3000),
-      questions,
       createdAt: new Date().toISOString(),
     };
 
@@ -134,7 +106,8 @@ Return ONLY the JSON array, no additional text.`;
     return NextResponse.json({
       success: true,
       sessionId,
-      questionCount: questions.length,
+      resumeText: resumeText.substring(0, 5000),
+      jobDescriptionText: jobDescriptionText.substring(0, 3000),
       message: "Files uploaded and processed successfully",
     });
   } catch (error) {
@@ -146,42 +119,3 @@ Return ONLY the JSON array, no additional text.`;
   }
 }
 
-function generateDefaultQuestions() {
-  return [
-    {
-      id: 1,
-      question: "Can you tell me about yourself and your professional background?",
-      category: "experience"
-    },
-    {
-      id: 2,
-      question: "What interests you most about this position and our company?",
-      category: "behavioral"
-    },
-    {
-      id: 3,
-      question: "Describe a challenging project you've worked on. What was your role and how did you overcome obstacles?",
-      category: "problem-solving"
-    },
-    {
-      id: 4,
-      question: "What technical skills from your resume do you feel are most relevant to this role?",
-      category: "technical"
-    },
-    {
-      id: 5,
-      question: "How do you stay updated with the latest trends and technologies in your field?",
-      category: "technical"
-    },
-    {
-      id: 6,
-      question: "Tell me about a time when you had to work with a difficult team member. How did you handle it?",
-      category: "behavioral"
-    },
-    {
-      id: 7,
-      question: "Where do you see yourself in 5 years, and how does this role fit into your career goals?",
-      category: "experience"
-    }
-  ];
-}

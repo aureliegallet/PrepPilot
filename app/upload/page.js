@@ -49,16 +49,18 @@ export default function UploadPage() {
 
       const data = await response.json();
       
-      toast.success(`Successfully uploaded! ${data.questionCount} questions generated.`);
+      toast.success("Files uploaded successfully! Review the extracted content.");
       
-      // Store session ID for the interview
+      // Store session data for review
       if (typeof window !== "undefined") {
-        sessionStorage.setItem("interviewSessionId", data.sessionId);
+        sessionStorage.setItem("reviewSessionId", data.sessionId);
+        sessionStorage.setItem("resumeText", data.resumeText);
+        sessionStorage.setItem("jobDescriptionText", data.jobDescriptionText);
       }
 
-      // Navigate to interview page
+      // Navigate to review page
       setTimeout(() => {
-        router.push("/interview");
+        router.push("/review");
       }, 1000);
     } catch (error) {
       console.error("Upload error:", error);

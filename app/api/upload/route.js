@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import pdfParse from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 import mammoth from "mammoth";
 
 // Helper function to extract text from file buffer
@@ -12,7 +12,8 @@ async function extractTextFromFile(file) {
   try {
     // Handle PDF files
     if (fileType === "application/pdf" || fileName.endsWith(".pdf")) {
-      const data = await pdfParse(nodeBuffer);
+      const pdfParse = new PDFParse();
+      const data = await pdfParse.parse(nodeBuffer);
       return data.text;
     }
     

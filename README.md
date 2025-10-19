@@ -30,25 +30,31 @@ npm -v
 ```
 
 ## Quick Start
-1. Open PowerShell or Command Prompt and cd into the project root (where `package.json` is):
-
+1. Download or clone the repository by opening PowerShell or Command Prompt:
 ```powershell
-cd "C:\Users\charran\Desktop\PrepPilot"
+git clone https://github.com/aureliegallet/PrepPilot.git
 ```
 
-2. Install dependencies:
+
+2. cd into the project root (where `package.json` is):
+
+```powershell
+cd PrepPilot
+```
+
+3. Install dependencies:
 
 ```powershell
 npm install
 ```
 
-3. Start the development server:
+4. Start the development server:
 
 ```powershell
 npm run dev
 ```
 
-4. Open your browser to:
+5. Open your browser to:
 
 ```
 http://localhost:3000
@@ -73,9 +79,9 @@ Top-level:
 
 - `app/` — Next.js App Router pages and server actions
 	- `app/page.js` — Landing page
-	- `app/upload/page.js` — Upload workflow
-	- `app/interview/page.js` — Interview UI
-	- `app/feedback/page.js` — Feedback and charts
+	- `app/upload.js` — Upload workflow
+	- `app/interview.js` — Interview UI
+	- `app/feedback.js` — Feedback and charts
 	- `app/api/` — Mock server route handlers (upload, interview, feedback)
 - `components/` — Reusable components (FileUpload, AudioVisualizer, StepIndicator)
 - `lib/utils.js` — Utilities used across app

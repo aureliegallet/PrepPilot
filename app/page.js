@@ -93,7 +93,7 @@ export default function Home() {
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Let PrepPilot be your guide. Upload your resume and job description,
-              and we'll help you chart a course to interview success.
+              and we&apos;ll help you chart a course to interview success.
             </p>
           </motion.div>
 

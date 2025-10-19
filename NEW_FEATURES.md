@@ -6,7 +6,7 @@ This update addresses user feedback by implementing three major features:
 2. Real audio recording playback
 3. Configurable time limits for answers
 
-## 1. PDF Report Download
+## 3. PDF Report Download 📄
 
 ### What Was Missing
 Previously, the download report button only showed an alert message without generating an actual PDF.
@@ -18,14 +18,80 @@ Previously, the download report button only showed an alert message without gene
   - Duration and questions answered
   - Complete strengths list
   - Complete areas for improvement list
-  - Detailed per-question feedback with scores
+  - Detailed per-question feedback with scores in improved format
+- **Improved Question Format**: Each question now displays with clear sections:
+  - **Question N (Score: X/100)** - Header with question number and score
+  - **Question:** [question text]
+  - **Transcription:** [user's answer]
+  - **Feedback:** [AI-generated feedback]
 - **Professional Formatting**: 
   - Automatic pagination
   - Headers and footers on each page
   - Proper text wrapping
-  - Clean layout
+  - Bold labels for section headers
+  - Clean layout with proper spacing
 - **Automatic Naming**: Downloads as `PrepPilot-Feedback-YYYY-MM-DD.pdf`
 - **User Feedback**: Toast notifications for success/error
+
+### Technical Implementation
+```javascript
+// Detailed Feedback - Updated Format
+detailedFeedback.forEach((item, idx) => {
+  // Question header with score
+  doc.setFontSize(13);
+  doc.setFont(undefined, 'bold');
+  doc.text(`Question ${idx + 1} (Score: ${item.score}/100)`, 20, yPos);
+  yPos += 8;
+
+  // Question section
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'bold');
+  doc.text("Question:", 20, yPos);
+  yPos += 6;
+  
+  doc.setFont(undefined, 'normal');
+  const questionLines = doc.splitTextToSize(item.question, pageWidth - 40);
+  questionLines.forEach(line => {
+    doc.text(line, 20, yPos);
+    yPos += 6;
+  });
+  yPos += 4;
+
+  // Transcription section
+  doc.setFont(undefined, 'bold');
+  doc.text("Transcription:", 20, yPos);
+  yPos += 6;
+  
+  doc.setFont(undefined, 'normal');
+  const transcriptionLines = doc.splitTextToSize(item.answer, pageWidth - 40);
+  transcriptionLines.forEach(line => {
+    doc.text(line, 20, yPos);
+    yPos += 6;
+  });
+  yPos += 4;
+
+  // Feedback section
+  doc.setFont(undefined, 'bold');
+  doc.text("Feedback:", 20, yPos);
+  yPos += 6;
+  
+  doc.setFont(undefined, 'normal');
+  const feedbackLines = doc.splitTextToSize(item.feedback, pageWidth - 40);
+  feedbackLines.forEach(line => {
+    doc.text(line, 20, yPos);
+    yPos += 6;
+  });
+  yPos += 10;
+});
+```
+
+**Result format:**
+```
+Question 1 (Score: 85/100)
+Question: Can you tell me about yourself and your professional background?
+Transcription: I am a software engineer with 5 years of experience...
+Feedback: Excellent introduction! You clearly communicated your background...
+```
 
 ### Technical Implementation
 ```javascript

@@ -195,7 +195,7 @@ export default function FeedbackPage() {
         >
           <h1 className="text-4xl font-bold mb-4">Your Interview Feedback</h1>
           <p className="text-lg text-muted-foreground">
-            Here's a comprehensive analysis of your performance
+            Here&apos;s a comprehensive analysis of your performance
           </p>
         </motion.div>
 
@@ -463,7 +463,7 @@ export default function FeedbackPage() {
             <CardContent className="p-8 text-center space-y-4">
               <h2 className="text-3xl font-bold">Great Job on Completing the Interview!</h2>
               <p className="text-lg opacity-90 max-w-2xl mx-auto">
-                Practice makes perfect. The more you practice, the more confident you'll become.
+                Practice makes perfect. The more you practice, the more confident you&apos;ll become.
                 Ready for another round?
               </p>
               <Link href="/upload">

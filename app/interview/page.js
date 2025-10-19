@@ -379,7 +379,7 @@ export default function InterviewPage() {
                   <div className="space-y-4">
                     {messages.length === 0 ? (
                       <div className="text-center py-12 text-muted-foreground">
-                        <p>Click "Start Interview" to begin</p>
+                        <p>Click &quot;Start Interview&quot; to begin</p>
                       </div>
                     ) : (
                       <AnimatePresence>
@@ -442,7 +442,7 @@ export default function InterviewPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>End Interview?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to end the interview? You've answered {currentQuestionIndex + 1} out of {questions.length} questions.
+              Are you sure you want to end the interview? You&apos;ve answered {currentQuestionIndex + 1} out of {questions.length} questions.
               Your feedback will be generated based on your current responses.
             </AlertDialogDescription>
           </AlertDialogHeader>
